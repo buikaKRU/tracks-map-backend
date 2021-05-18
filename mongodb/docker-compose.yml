@@ -3,17 +3,53 @@ services:
   mongodb:
     image: mongo
     container_name: mongodb
-    # networks:
-    #   - mongodb-network
     environment:
-      - PUID=1000
-      - PGID=1000
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=pass12345
     volumes:
-      - ~/desktop/2105-tracks-map_backend/mongodb/database:/data/db
+      - mongodb-data:/data/db
+    networks:
+      - mongodb_network
     ports:
       - 27020:27017
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo 10.10.10.60:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
     restart: unless-stopped
 
-# networks:
-#   mongodb-network:
-#     name: mongodb-network
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass12345
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin123
+    volumes:
+      - mongodb-data
+    depends_on:
+      - mongodb
+    networks:
+      - mongodb_network
+    ports:
+      - 8081:8081
+    healthcheck:
+      test: wget --quiet --tries=3 --spider http://admin:admin123@10.10.10.60:8081 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  mongodb-data:
+    name: mongodb-data
+
+networks:
+  mongodb_network:
+    name: mongodb_network
+# source
+# https://www.bmc.com/blogs/mongodb-docker-container/#:~:text=Docker%20can%20be%20used%20to,worry%20about%20the%20underlying%20configuration.
