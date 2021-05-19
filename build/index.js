@@ -4,9 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-console.log('start');
-console.log('start1');
-console.log('start2');
+const database_1 = __importDefault(require("./database"));
+database_1.default();
 //https://blog.logrocket.com/typescript-with-node-js-and-express/
 const app = express_1.default();
 const PORT = 8000;

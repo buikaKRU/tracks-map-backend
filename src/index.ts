@@ -1,8 +1,11 @@
 
 import express from 'express';
+import connect from './database';
 
 
 
+
+connect();
 
 //https://blog.logrocket.com/typescript-with-node-js-and-express/
 const app = express();
