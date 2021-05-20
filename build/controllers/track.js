@@ -13,8 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+//@ts-ignore
+const multer_1 = __importDefault(require("multer"));
 const Track_1 = __importDefault(require("../models/Track"));
-const formidable_1 = __importDefault(require("formidable"));
 const router = express_1.default.Router();
 // Get all posts
 router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -31,33 +32,34 @@ router.post("/addTest", (req, res) => __awaiter(void 0, void 0, void 0, function
     yield track.save;
     res.send(track);
 }));
-//const upload = multer({dest: 'public/uploads/'}).single('file');
 router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const form = formidable_1.default({ multiples: false, uploadDir: './public' });
-    form.parse(req, (err, fields, files) => {
-        if (err) {
-            //@ts-ignore
-            next(err);
-            return;
-        }
-        res.json({ files });
-    });
-    // upload(req,res, (err: any) => {
-    //   if (!err) {
+    // const form = formidable({multiples: false, uploadDir: './public'})
+    // form.parse(req, (err, fields, files) => {
+    //   if (err) {
     //     //@ts-ignore
-    //     const file = req.file
-    //     //console.log('file', file)
-    //     // res.render('game', {
-    //     //   name: req.body.name
-    //     // })
-    //     return res.send()
+    //     next(err);
+    //     return;
     //   }
-    // })
-    // const track = new Track({
-    //   name: req.body.name || 'default'
-    // })
-    // track.save();
-    // await track.save;
+    //   res.json({ files });
+    // });
+    var storage = multer_1.default.memoryStorage();
+    const upload = multer_1.default({ dest: 'public/uploads/', storage: storage }).single('file');
+    upload(req, res, (err) => __awaiter(void 0, void 0, void 0, function* () {
+        if (!err) {
+            //@ts-ignore
+            const file = req.file;
+            console.log('file', file);
+            //console.log(file)
+            const str = file.buffer.toString('utf-8');
+            const track = new Track_1.default({
+                name: file.originalname || 'defaultName',
+                originalContent: str
+            });
+            track.save();
+            yield track.save;
+            return res.json({ track });
+        }
+    }));
     // try {
     //   //console.log('------------- ', req);
     //   //@ts-ignore
