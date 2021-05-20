@@ -7,6 +7,6 @@ var TrackSchema = new Schema({
 });
 
 // Compile model from schema
-const Track = mongoose.model('TrackSchema', TrackSchema );
+const Track = mongoose.model('Track', TrackSchema );
 
 export default Track

@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _a;f
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const chalk = require('chalk');
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -26,9 +26,9 @@ dotenv_1.default.config({
 });
 //@ts-ignore
 const env = dotenv_1.default.parsed || process.env;
-console.log('env', env.DB_CONNECTION);
 const connect = () => __awaiter(void 0, void 0, void 0, function* () {
-    const mongoConnectionString = `${env.DB_CONNECTION}:${env.DB_PORT}/`;
+    const mongoConnectionString = `mongodb://${env.DB_USER}:${env.DB_PASS}@${env.DB_URI}:${env.DB_PORT}/data?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false`;
+    //console.log(mongoConnectionString);
     try {
         const opts = {
             useUnifiedTopology: true,
@@ -36,10 +36,12 @@ const connect = () => __awaiter(void 0, void 0, void 0, function* () {
             useFindAndModify: false,
         };
         yield mongoose_1.default.connect(mongoConnectionString, opts);
-        console.log(chalk.green(`🤘 Connected to the [${process.env.NODE_ENV}] database on port ${env.DB_PORT}`));
+        console.log(chalk.green(`[database] 🤘 Connected to the "${process.env.NODE_ENV}" database on port ${env.DB_PORT}`));
     }
     catch (err) {
-        console.log(chalk.red('Problem with connecting to the database'));
+        console.log(chalk.red('[database] Problem with connecting to the database'));
+        console.log(err);
     }
+    ;
 });
 exports.default = connect;

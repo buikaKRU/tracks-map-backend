@@ -25,5 +25,5 @@ var TrackSchema = new mongoose_1.Schema({
     //a_date: Date
 });
 // Compile model from schema
-const Track = mongoose_1.default.model('TrackSchema', TrackSchema);
+const Track = mongoose_1.default.model('Track', TrackSchema);
 exports.default = Track;

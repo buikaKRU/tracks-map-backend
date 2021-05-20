@@ -19,13 +19,16 @@ const router = express_1.default.Router();
 router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('maybe??');
     const tracks = yield Track_1.default.find();
-    // res.send(tracks)
     res.send(tracks);
+    //res.send('tracks')
 }));
 router.post("/add", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('add');
-    res.send(req.body);
-    res.status(200);
+    const track = new Track_1.default({
+        name: req.body.name || 'default'
+    });
+    track.save();
+    yield track.save;
+    res.send(track);
 }));
 const tracks = router;
 exports.default = tracks;

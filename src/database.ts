@@ -17,10 +17,11 @@ dotenv.config({
 //@ts-ignore
 const env = dotenv.parsed || process.env;
 
-console.log('env', env.DB_CONNECTION)
-
 const connect = async () => {
-  const mongoConnectionString = `${env.DB_CONNECTION}:${env.DB_PORT}/`;
+  const mongoConnectionString = `mongodb://${env.DB_USER}:${env.DB_PASS}@${env.DB_URI}:${env.DB_PORT}/data?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false`
+  //console.log(mongoConnectionString);
+  
+
   try {
     const opts = {
       useUnifiedTopology: true,
@@ -29,11 +30,12 @@ const connect = async () => {
     };
     await mongoose.connect(mongoConnectionString, opts);
     console.log(
-      chalk.green(`🤘 Connected to the [${process.env.NODE_ENV}] database on port ${env.DB_PORT}`)
-    );
+      chalk.green(`[database] 🤘 Connected to the "${process.env.NODE_ENV}" database on port ${env.DB_PORT}`)
+      );
   } catch (err) {
-    console.log(chalk.red('Problem with connecting to the database'));
-  }
+    console.log(chalk.red('[database] Problem with connecting to the database'));
+    console.log(err)
+  };
 };
 
 export default connect;
