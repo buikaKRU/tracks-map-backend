@@ -19,7 +19,7 @@ const env = dotenv.parsed || process.env;
 
 const connect = async () => {
   const mongoConnectionString = `mongodb://${env.DB_USER}:${env.DB_PASS}@${env.DB_URI}:${env.DB_PORT}/data?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false`
-  //console.log(mongoConnectionString);
+  console.log(mongoConnectionString);
   
 
   try {
