@@ -1,13 +1,13 @@
-GET http://localhost:5050/api/v1/tracks
+GET http://localhost:5000/api/v1/tracks
 
 ###
 
-GET http://localhost:5050
+GET http://localhost:5000
 
 
 ###
 
-POST http://localhost:5050/api/v1/tracks/add
+POST http://localhost:5000/api/v1/tracks/addFile
 Content-Type: application/json
 
 {

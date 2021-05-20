@@ -7,18 +7,23 @@
     "test": "cross-env NODE_ENV=test echo \"Error: no test specified\" && exit 1",
     "project": "tsc --project ./",
     "build": "tsc -w",
-    "dev": "cross-env NODE_ENV=development concurrently \"npm run build\" \"nodemon build/index.js --ignore '*.json'\""
+    "start": "node build/index.js",
+    "dev": "cross-env NODE_ENV=development concurrently \"npm run build\" \"nodemon --ignore public/ --delay 500ms build/index.js --ignore '*.json'\""
   },
   "author": "mateusz przybylowski",
   "license": "ISC",
   "dependencies": {
     "@types/cors": "^2.8.10",
     "@types/dotenv": "^8.2.0",
+    "@types/morgan": "^1.9.2",
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^9.0.2",
     "express": "^4.17.1",
     "mongoose": "^5.12.9",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.2",
     "ts-node": "^9.1.1"
   },
   "devDependencies": {

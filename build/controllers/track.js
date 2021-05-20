@@ -13,6 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+//@ts-ignore
+const multer_1 = __importDefault(require("multer"));
 const Track_1 = __importDefault(require("../models/Track"));
 const router = express_1.default.Router();
 // Get all posts
@@ -22,13 +24,41 @@ router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(tracks);
     //res.send('tracks')
 }));
-router.post("/add", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/addTest", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const track = new Track_1.default({
         name: req.body.name || 'default'
     });
     track.save();
     yield track.save;
     res.send(track);
+}));
+const upload = multer_1.default({ dest: 'public/uploads/' }).single('file');
+router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('post');
+    //console.log('-------------', req.name);
+    upload(req, res, (err) => {
+        //@ts-ignore
+        const file = req.file;
+        if (!err) {
+            console.log(file);
+            return res.send('okay');
+        }
+    });
+    // const track = new Track({
+    //   name: req.body.name || 'default'
+    // })
+    // track.save();
+    // await track.save;
+    // try {
+    //   //console.log('------------- ', req);
+    //   //@ts-ignore
+    //   // console.log('------------- ', req.name );
+    //   res.status(200)
+    //   res.send(req)
+    // } catch (e) {
+    //   // res.status(500)
+    //   // res.send(e)
+    // }
 }));
 const tracks = router;
 exports.default = tracks;

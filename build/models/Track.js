@@ -23,6 +23,8 @@ const mongoose_1 = __importStar(require("mongoose"));
 var TrackSchema = new mongoose_1.Schema({
     name: String,
     //a_date: Date
+    originalContent: String,
+    categories: [String]
 });
 // Compile model from schema
 const Track = mongoose_1.default.model('Track', TrackSchema);
