@@ -1,7 +1,7 @@
-
-import bodyParser, { urlencoded } from 'body-parser';
+import express from 'express',
 import connect from './database';
 import morgan from 'morgan' // Node.js middleware for logging HTTP requests.
+import formData from 'express-form-data'
 
 import app from './server';
 
@@ -15,7 +15,11 @@ const PORT = 5000;
 
 //app.use(morgan('dev'));
 
-app.use(urlencoded({extended: true}))
+app.use(express.json());
+app.use(express.urlencoded({extended: true}))
+app.use(formData.parse())
+// union the body and the files
+app.use(formData.union());
 
 
 connect().then(()=>{
@@ -30,8 +34,6 @@ connect().then(()=>{
   }, 1000)
 }).catch((e) => {
   console.log(e);
-
-
 })
 
 

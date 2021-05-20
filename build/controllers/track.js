@@ -13,9 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-//@ts-ignore
-const multer_1 = __importDefault(require("multer"));
 const Track_1 = __importDefault(require("../models/Track"));
+const formidable_1 = __importDefault(require("formidable"));
 const router = express_1.default.Router();
 // Get all posts
 router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -32,18 +31,28 @@ router.post("/addTest", (req, res) => __awaiter(void 0, void 0, void 0, function
     yield track.save;
     res.send(track);
 }));
-const upload = multer_1.default({ dest: 'public/uploads/' }).single('file');
+//const upload = multer({dest: 'public/uploads/'}).single('file');
 router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('post');
-    //console.log('-------------', req.name);
-    upload(req, res, (err) => {
-        //@ts-ignore
-        const file = req.file;
-        if (!err) {
-            console.log(file);
-            return res.send('okay');
+    const form = formidable_1.default({ multiples: false, uploadDir: './public' });
+    form.parse(req, (err, fields, files) => {
+        if (err) {
+            //@ts-ignore
+            next(err);
+            return;
         }
+        res.json({ files });
     });
+    // upload(req,res, (err: any) => {
+    //   if (!err) {
+    //     //@ts-ignore
+    //     const file = req.file
+    //     //console.log('file', file)
+    //     // res.render('game', {
+    //     //   name: req.body.name
+    //     // })
+    //     return res.send()
+    //   }
+    // })
     // const track = new Track({
     //   name: req.body.name || 'default'
     // })

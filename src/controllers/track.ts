@@ -1,7 +1,10 @@
 import express from 'express'
+import { lstat, writeFileSync } from 'fs'
 //@ts-ignore
 import multer from 'multer'
 import Track from '../models/Track'
+
+import formidable from 'formidable'
 
 
 const router = express.Router()
@@ -26,28 +29,40 @@ router.post("/addTest", async (req, res) => {
 })
 
 
-const upload = multer({dest: 'public/uploads/'}).single('file');
+//const upload = multer({dest: 'public/uploads/'}).single('file');
 
 router.post("/addFile", async (req, res) => {
 
-  console.log('post')
-  //console.log('-------------', req.name);
+  const form = formidable({multiples: false, uploadDir: './public'})
 
-  
-  
-  upload(req,res, (err: any) => {
-    
-    //@ts-ignore
-    const file = req.file
-    if (!err) {
-      
-      
-      console.log(file)
-      
-      return res.send('okay')
-      
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      //@ts-ignore
+      next(err);
+      return;
     }
-  })
+    res.json({ files });
+  });
+
+
+
+ 
+  // upload(req,res, (err: any) => {
+    
+  //   if (!err) {
+  //     //@ts-ignore
+  //     const file = req.file
+  //     //console.log('file', file)
+      
+  //     // res.render('game', {
+  //     //   name: req.body.name
+  //     // })
+      
+  //     return res.send()
+
+      
+  //   }
+  // })
   
   // const track = new Track({
   //   name: req.body.name || 'default'
