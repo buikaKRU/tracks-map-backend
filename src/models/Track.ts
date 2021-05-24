@@ -5,7 +5,8 @@ var TrackSchema = new Schema({
   name: String,
   //a_date: Date
   originalContent: String,
-  categories: [String]
+  categories: [String],
+  geoJson: {}
 });
 
 // Compile model from schema

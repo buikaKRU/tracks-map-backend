@@ -1,4 +1,4 @@
-import express from 'express',
+import express from 'express';
 import connect from './database';
 import morgan from 'morgan' // Node.js middleware for logging HTTP requests.
 import formData from 'express-form-data'
