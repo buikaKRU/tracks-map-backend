@@ -40,12 +40,10 @@ var storage = multer_1.default.memoryStorage();
 const upload = multer_1.default({ dest: 'public/uploads/', storage: storage }).single('file');
 const router = express_1.default.Router();
 // Get all posts
-router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('maybe??');
     const tracks = yield Track_1.default.find();
-    const tracksGeoJsons = [];
-    tracks.forEach((tr) => tracksGeoJsons.push(tr.geoJson));
-    res.send(tracksGeoJsons);
+    res.json({ lenght: tracks.length, tracks });
     //res.send('tracks')
 }));
 router.post("/addTest", (req, res) => __awaiter(void 0, void 0, void 0, function* () {

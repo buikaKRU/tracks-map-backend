@@ -22,11 +22,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 var TrackSchema = new mongoose_1.Schema({
     name: String,
-    //a_date: Date
     categories: [String],
     geoJson: {},
-    // originalContent: mongoose.Types.ObjectId
-    originalContent: String
+    originalContent: mongoose_1.default.Types.ObjectId
+    //a_date: Date
 });
 // Compile model from schema
 const Track = mongoose_1.default.model('Track', TrackSchema);

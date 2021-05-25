@@ -42,12 +42,10 @@ const upload = multer({dest: 'public/uploads/', storage: storage }).single('file
 const router = express.Router()
 
 // Get all posts
-router.get("/", async (req, res) => {
+router.get("/all", async (req, res) => {
   console.log('maybe??')
 	const tracks = await Track.find();
-  const tracksGeoJsons: any[] = [];
-  tracks.forEach((tr: { geoJson: any; }) => tracksGeoJsons.push(tr.geoJson))
-	res.send(tracksGeoJsons)
+	res.json({lenght: tracks.length, tracks})
   //res.send('tracks')
 })
 

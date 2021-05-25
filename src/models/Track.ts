@@ -1,14 +1,19 @@
-import mongoose, {Schema} from 'mongoose'
-import OriginalTrack from './OriginalTrack';
+import { GeoJson } from './../GeoJson';
+import mongoose, {Schema} from 'mongoose';
 
+export type Track = {
+  name: string,
+  categories: string[],
+  geoJson: GeoJson,
+  originalContent: string
+}
 
 var TrackSchema = new Schema({
   name: String,
-  //a_date: Date
   categories: [String],
   geoJson: {},
-  // originalContent: mongoose.Types.ObjectId
-  originalContent: String
+  originalContent: mongoose.Types.ObjectId
+  //a_date: Date
 });
 
 // Compile model from schema
