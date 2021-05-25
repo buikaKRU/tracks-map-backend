@@ -1,12 +1,14 @@
 import mongoose, {Schema} from 'mongoose'
+import OriginalTrack from './OriginalTrack';
 
 
 var TrackSchema = new Schema({
   name: String,
   //a_date: Date
-  originalContent: String,
   categories: [String],
-  geoJson: {}
+  geoJson: {},
+  // originalContent: mongoose.Types.ObjectId
+  originalContent: String
 });
 
 // Compile model from schema
