@@ -5,7 +5,7 @@ import express from 'express'
 import { kml,kmlGen } from "@tmcw/togeojson";
 //@ts-ignore
 import multer from 'multer'
-import Track from '../models/Track'
+import Track, {TrackCategories} from '../models/Track'
 
 
 import {DOMParser} from 'xmldom'
@@ -63,8 +63,6 @@ router.post("/addTest", async (req, res) => {
 
 router.post("/addFile", async (req, res) => {
   
-
-    
   upload(req,res, async (err: any) => {
     
     if (!err) {
@@ -75,23 +73,31 @@ router.post("/addFile", async (req, res) => {
 
       console.log('--------- fileFormat', fileFormat)
 
-      const categories: string[] = []
+      const categories = new TrackCategories()
       //console.log(file)
       const str = file.buffer.toString('utf-8')
       
       if (fileFormat === 'kml') { 
 
         const kmlParsed = new DOMParser().parseFromString(str);
-      
         const geoJson: GeoJson = kml(kmlParsed);
-  
+        
+        // add track / point categories
         geoJson.features.forEach(feature => {
+          const featureType = feature.geometry.type 
           console.log('category', feature.properties.name, feature.properties.Category)
-          categories.push(feature.properties.Category);
+          const featureCategory = feature.properties.Category;
+          console.log('featureType', featureType)
+          console.log('category', featureCategory)
+          if (featureCategory?.length>0) {
+            featureType==="Point" && categories.point.indexOf(featureCategory) === -1 && categories.point.push(featureCategory)
+            featureType==="LineString" && categories.track.indexOf(featureCategory) === -1 && categories.track.push(featureCategory)
+          }
         })
   
         console.log('categories', categories)
 
+        // add original track
         const originalTrack = new OriginalTrack({
           originalName: fileName || '',
           originalContent: str,
@@ -99,14 +105,12 @@ router.post("/addFile", async (req, res) => {
         })
 
         await originalTrack.save();
-
-      
+    
         const track = new Track({
           name: fileName || 'defaultName',
           categories: categories,
           geoJson: geoJson,
           originalContent: originalTrack._id
-          //originalContent: str
         })
         await track.save();
   
@@ -117,8 +121,8 @@ router.post("/addFile", async (req, res) => {
         res.status(500).json({ error: 'gpx file format is not supported' })
       }
       
-   
-
+    } else {
+      res.status(500).json({ error: 'upload error' })
       
     }
   })

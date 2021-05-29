@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -16,7 +35,7 @@ const express_1 = __importDefault(require("express"));
 const togeojson_1 = require("@tmcw/togeojson");
 //@ts-ignore
 const multer_1 = __importDefault(require("multer"));
-const Track_1 = __importDefault(require("../models/Track"));
+const Track_1 = __importStar(require("../models/Track"));
 const xmldom_1 = require("xmldom");
 const OriginalTrack_1 = __importDefault(require("../models/OriginalTrack"));
 // const str = kmlMockupString();
@@ -62,17 +81,26 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
             const fileName = (_a = file.originalname) === null || _a === void 0 ? void 0 : _a.split('.')[0];
             const fileFormat = file.originalname.split('.')[1];
             console.log('--------- fileFormat', fileFormat);
-            const categories = [];
+            const categories = new Track_1.TrackCategories();
             //console.log(file)
             const str = file.buffer.toString('utf-8');
             if (fileFormat === 'kml') {
                 const kmlParsed = new xmldom_1.DOMParser().parseFromString(str);
                 const geoJson = togeojson_1.kml(kmlParsed);
+                // add track / point categories
                 geoJson.features.forEach(feature => {
+                    const featureType = feature.geometry.type;
                     console.log('category', feature.properties.name, feature.properties.Category);
-                    categories.push(feature.properties.Category);
+                    const featureCategory = feature.properties.Category;
+                    console.log('featureType', featureType);
+                    console.log('category', featureCategory);
+                    if ((featureCategory === null || featureCategory === void 0 ? void 0 : featureCategory.length) > 0) {
+                        featureType === "Point" && categories.point.indexOf(featureCategory) === -1 && categories.point.push(featureCategory);
+                        featureType === "LineString" && categories.track.indexOf(featureCategory) === -1 && categories.track.push(featureCategory);
+                    }
                 });
                 console.log('categories', categories);
+                // add original track
                 const originalTrack = new OriginalTrack_1.default({
                     originalName: fileName || '',
                     originalContent: str,
@@ -84,7 +112,6 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
                     categories: categories,
                     geoJson: geoJson,
                     originalContent: originalTrack._id
-                    //originalContent: str
                 });
                 yield track.save();
                 // return res.status(500).json( {error: 'some error'})
@@ -93,6 +120,9 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
             else {
                 res.status(500).json({ error: 'gpx file format is not supported' });
             }
+        }
+        else {
+            res.status(500).json({ error: 'upload error' });
         }
     }));
 }));
