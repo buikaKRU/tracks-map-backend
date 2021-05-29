@@ -5,7 +5,7 @@ import express from 'express'
 import { kml,kmlGen } from "@tmcw/togeojson";
 //@ts-ignore
 import multer from 'multer'
-import Track, {TrackCategories} from '../models/Track'
+import Track, {DateTrack, TrackCategories} from '../models/Track'
 
 
 import {DOMParser} from 'xmldom'
@@ -70,6 +70,7 @@ router.post("/addFile", async (req, res) => {
       const file = await req.file;
       const fileName = file.originalname?.split('.')[0]
       const fileFormat: 'gpx' | 'kml' = file.originalname.split('.')[1];
+      let date: DateTrack
 
       console.log('--------- fileFormat', fileFormat)
 
@@ -82,10 +83,10 @@ router.post("/addFile", async (req, res) => {
         const kmlParsed = new DOMParser().parseFromString(str);
         const geoJson: GeoJson = kml(kmlParsed);
         
-        // add track / point categories
+        // categories and date
         geoJson.features.forEach(feature => {
-          const featureType = feature.geometry.type 
-          console.log('category', feature.properties.name, feature.properties.Category)
+          const featureType = feature.geometry.type      
+          // categories
           const featureCategory = feature.properties.Category;
           console.log('featureType', featureType)
           console.log('category', featureCategory)
@@ -93,9 +94,18 @@ router.post("/addFile", async (req, res) => {
             featureType==="Point" && categories.point.indexOf(featureCategory) === -1 && categories.point.push(featureCategory)
             featureType==="LineString" && categories.track.indexOf(featureCategory) === -1 && categories.track.push(featureCategory)
           }
+          // date
+          if (!!!date && featureType === 'LineString') {
+            const dateString = feature.properties.timespan?.begin;
+            !!dateString && (date = {str: dateString.split('T')[0], ms: Date.parse(dateString)})
+          }
+          
         })
+
+        
   
         console.log('categories', categories)
+        console.log('date', date)
 
         // add original track
         const originalTrack = new OriginalTrack({

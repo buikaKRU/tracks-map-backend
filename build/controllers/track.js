@@ -80,6 +80,7 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
             const file = yield req.file;
             const fileName = (_a = file.originalname) === null || _a === void 0 ? void 0 : _a.split('.')[0];
             const fileFormat = file.originalname.split('.')[1];
+            let date;
             console.log('--------- fileFormat', fileFormat);
             const categories = new Track_1.TrackCategories();
             //console.log(file)
@@ -87,10 +88,11 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
             if (fileFormat === 'kml') {
                 const kmlParsed = new xmldom_1.DOMParser().parseFromString(str);
                 const geoJson = togeojson_1.kml(kmlParsed);
-                // add track / point categories
+                // categories and date
                 geoJson.features.forEach(feature => {
+                    var _a;
                     const featureType = feature.geometry.type;
-                    console.log('category', feature.properties.name, feature.properties.Category);
+                    // categories
                     const featureCategory = feature.properties.Category;
                     console.log('featureType', featureType);
                     console.log('category', featureCategory);
@@ -98,8 +100,14 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
                         featureType === "Point" && categories.point.indexOf(featureCategory) === -1 && categories.point.push(featureCategory);
                         featureType === "LineString" && categories.track.indexOf(featureCategory) === -1 && categories.track.push(featureCategory);
                     }
+                    // date
+                    if (!!!date && featureType === 'LineString') {
+                        const dateString = (_a = feature.properties.timespan) === null || _a === void 0 ? void 0 : _a.begin;
+                        !!dateString && (date = { str: dateString.split('T')[0], ms: Date.parse(dateString) });
+                    }
                 });
                 console.log('categories', categories);
+                console.log('date', date);
                 // add original track
                 const originalTrack = new OriginalTrack_1.default({
                     originalName: fileName || '',
