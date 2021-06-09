@@ -36,8 +36,8 @@ var TrackSchema = new mongoose_1.Schema({
         point: [String]
     },
     geoJson: {},
-    indexId: mongoose_1.default.Types.ObjectId,
-    indexPath: String,
+    libraryIndexId: mongoose_1.default.Types.ObjectId,
+    path: String,
     originalContent: mongoose_1.default.Types.ObjectId,
     date: {
         ms: Number,

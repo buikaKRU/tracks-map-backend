@@ -5,8 +5,8 @@ export type Track = {
   name: string,
   categories: TrackCategories
   geoJson: GeoJson,
-  indexId: string
-  indexPath: string,
+  libraryIndexId: string
+  path: string,
   date: DateTrack
   originalContent: string
 }
@@ -29,8 +29,8 @@ var TrackSchema = new Schema({
     point: [String]
   },
   geoJson: {},
-  indexId: mongoose.Types.ObjectId,
-  indexPath: String,
+  libraryIndexId: mongoose.Types.ObjectId,
+  path: String,
   originalContent: mongoose.Types.ObjectId,
   date: {
     ms: Number,

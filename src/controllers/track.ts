@@ -10,6 +10,7 @@ import Track, {DateTrack, TrackCategories} from '../models/Track'
 
 import {DOMParser} from 'xmldom'
 import OriginalTrack from '../models/OriginalTrack';
+import LibraryIndex from '../models/LibraryIndex';
 
 
 
@@ -35,29 +36,46 @@ import OriginalTrack from '../models/OriginalTrack';
 // track.save();
 
 
+const router = express.Router()
 var storage = multer.memoryStorage()
 const upload = multer({dest: 'public/uploads/', storage: storage }).single('file');
 
 
-const router = express.Router()
 
-// Get all posts
+/** DEPRECATED get all tracks */
 router.get("/all", async (req, res) => {
   console.log('maybe??')
-	const tracks = await Track.find();
-	res.json({lenght: tracks.length, tracks})
+	const foundTracks = await Track.find();
+	res.json({lenght: foundTracks.length, foundTracks})
   //res.send('tracks')
 })
 
-router.post("/addTest", async (req, res) => {
-  
-  const track = new Track({
-    name: req.body.name || 'default'
-    
-  })
-  await track.save();
-  res.send(track);
+
+/** get track by id */
+router.get("/:id", async (req, res) => {
+  console.log('maybe??')
+  console.log(req.body.id)
+  const _id = req.params.id
+  if (_id) {
+    Track.findById(_id)
+    .then((track:any)=> res.send(track))
+    .catch(() => {
+      res.status(404).json({error: 'id not found'})
+    })
+  } else {
+    res.status(404).json({error: 'no id provided, add {id: string} object to request'})
+  }
 })
+
+// router.post("/addTest", async (req, res) => {
+  
+//   const track = new Track({
+//     name: req.body.name || 'default'
+    
+//   })
+//   await track.save();
+//   res.send(track);
+// })
 
 
 
@@ -68,9 +86,13 @@ router.post("/addFile", async (req, res) => {
     if (!err) {
       //@ts-ignore
       const file = await req.file;
-      const fileName = file.originalname?.split('.')[0]
+      const fileName = file.originalname?.split('.')[0] || 'default name'
       const fileFormat: 'gpx' | 'kml' = file.originalname.split('.')[1];
-      let date: DateTrack
+      let date: DateTrack = 
+      // {
+      //   ms: 0,
+      //   str: '1970-01-01'
+      // }
 
       console.log('--------- fileFormat', fileFormat)
 
@@ -85,7 +107,7 @@ router.post("/addFile", async (req, res) => {
         
         // categories and date
         geoJson.features.forEach(feature => {
-          const featureType = feature.geometry.type      
+          const featureType = feature.geometry?.type
           // categories
           const featureCategory = feature.properties.Category;
           console.log('featureType', featureType)
@@ -99,7 +121,6 @@ router.post("/addFile", async (req, res) => {
             const dateString = feature.properties.timespan?.begin;
             !!dateString && (date = {str: dateString.split('T')[0], ms: Date.parse(dateString)})
           }
-          
         })
 
         
@@ -109,20 +130,33 @@ router.post("/addFile", async (req, res) => {
 
         // add original track
         const originalTrack = new OriginalTrack({
-          originalName: fileName || '',
+          originalName: fileName,
           originalContent: str,
           format: fileFormat
         })
-
-        await originalTrack.save();
+        
+        const libraryIndex = new LibraryIndex({
+          name: fileName,
+          path: 'root/',
+          categories: categories,
+          date: date
+        })
     
         const track = new Track({
-          name: fileName || 'defaultName',
+          name: fileName,
+          path: 'root/',
+          date: date,
           categories: categories,
+          originalContent: originalTrack._id,
+          libraryIndexId: libraryIndex._id,
           geoJson: geoJson,
-          originalContent: originalTrack._id
         })
+
+        libraryIndex.trackId = track._id
+
+        await originalTrack.save();
         await track.save();
+        await libraryIndex.save();
   
         // return res.status(500).json( {error: 'some error'})
         return res.json( track.geoJson );
@@ -141,5 +175,4 @@ router.post("/addFile", async (req, res) => {
 
 const tracks = router;
 
-export default tracks;
-
+export default tracks

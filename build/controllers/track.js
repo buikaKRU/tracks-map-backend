@@ -38,6 +38,7 @@ const multer_1 = __importDefault(require("multer"));
 const Track_1 = __importStar(require("../models/Track"));
 const xmldom_1 = require("xmldom");
 const OriginalTrack_1 = __importDefault(require("../models/OriginalTrack"));
+const LibraryIndex_1 = __importDefault(require("../models/LibraryIndex"));
 // const str = kmlMockupString();
 // const categories: string[] = []
 // const kmlParsed = new DOMParser().parseFromString(str);
@@ -55,32 +56,52 @@ const OriginalTrack_1 = __importDefault(require("../models/OriginalTrack"));
 //   originalContent: str,
 // })
 // track.save();
+const router = express_1.default.Router();
 var storage = multer_1.default.memoryStorage();
 const upload = multer_1.default({ dest: 'public/uploads/', storage: storage }).single('file');
-const router = express_1.default.Router();
-// Get all posts
+/** DEPRECATED get all tracks */
 router.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('maybe??');
-    const tracks = yield Track_1.default.find();
-    res.json({ lenght: tracks.length, tracks });
+    const foundTracks = yield Track_1.default.find();
+    res.json({ lenght: foundTracks.length, foundTracks });
     //res.send('tracks')
 }));
-router.post("/addTest", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const track = new Track_1.default({
-        name: req.body.name || 'default'
-    });
-    yield track.save();
-    res.send(track);
+/** get track by id */
+router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('maybe??');
+    console.log(req.body.id);
+    const _id = req.params.id;
+    if (_id) {
+        Track_1.default.findById(_id)
+            .then((track) => res.send(track))
+            .catch(() => {
+            res.status(404).json({ error: 'id not found' });
+        });
+    }
+    else {
+        res.status(404).json({ error: 'no id provided, add {id: string} object to request' });
+    }
 }));
+// router.post("/addTest", async (req, res) => {
+//   const track = new Track({
+//     name: req.body.name || 'default'
+//   })
+//   await track.save();
+//   res.send(track);
+// })
 router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     upload(req, res, (err) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         if (!err) {
             //@ts-ignore
             const file = yield req.file;
-            const fileName = (_a = file.originalname) === null || _a === void 0 ? void 0 : _a.split('.')[0];
+            const fileName = ((_a = file.originalname) === null || _a === void 0 ? void 0 : _a.split('.')[0]) || 'default name';
             const fileFormat = file.originalname.split('.')[1];
-            let date;
+            let date = 
+            // {
+            //   ms: 0,
+            //   str: '1970-01-01'
+            // }
             console.log('--------- fileFormat', fileFormat);
             const categories = new Track_1.TrackCategories();
             //console.log(file)
@@ -90,8 +111,8 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
                 const geoJson = togeojson_1.kml(kmlParsed);
                 // categories and date
                 geoJson.features.forEach(feature => {
-                    var _a;
-                    const featureType = feature.geometry.type;
+                    var _a, _b;
+                    const featureType = (_a = feature.geometry) === null || _a === void 0 ? void 0 : _a.type;
                     // categories
                     const featureCategory = feature.properties.Category;
                     console.log('featureType', featureType);
@@ -102,7 +123,7 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
                     }
                     // date
                     if (!!!date && featureType === 'LineString') {
-                        const dateString = (_a = feature.properties.timespan) === null || _a === void 0 ? void 0 : _a.begin;
+                        const dateString = (_b = feature.properties.timespan) === null || _b === void 0 ? void 0 : _b.begin;
                         !!dateString && (date = { str: dateString.split('T')[0], ms: Date.parse(dateString) });
                     }
                 });
@@ -110,18 +131,29 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
                 console.log('date', date);
                 // add original track
                 const originalTrack = new OriginalTrack_1.default({
-                    originalName: fileName || '',
+                    originalName: fileName,
                     originalContent: str,
                     format: fileFormat
                 });
-                yield originalTrack.save();
-                const track = new Track_1.default({
-                    name: fileName || 'defaultName',
+                const libraryIndex = new LibraryIndex_1.default({
+                    name: fileName,
+                    path: 'root/',
                     categories: categories,
-                    geoJson: geoJson,
-                    originalContent: originalTrack._id
+                    date: date
                 });
+                const track = new Track_1.default({
+                    name: fileName,
+                    path: 'root/',
+                    date: date,
+                    categories: categories,
+                    originalContent: originalTrack._id,
+                    libraryIndexId: libraryIndex._id,
+                    geoJson: geoJson,
+                });
+                libraryIndex.trackId = track._id;
+                yield originalTrack.save();
                 yield track.save();
+                yield libraryIndex.save();
                 // return res.status(500).json( {error: 'some error'})
                 return res.json(track.geoJson);
             }

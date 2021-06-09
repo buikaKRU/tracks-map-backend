@@ -2,8 +2,20 @@ GET http://localhost:5000/api/v1/tracks/all
 
 ###
 
-GET http://localhost:5000
+GET http://localhost:5000/api/v1/tracks/60b26fbc0cd66445666f6408
+Content-Type: application/json
 
+# {
+#   "id": "60b26fbc0cd66445666f6408"
+# }
+
+###
+
+GET http://localhost:5000/api/v1/library/all
+
+###
+
+GET http://localhost:5000
 
 ###
 
