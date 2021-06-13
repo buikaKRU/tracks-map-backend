@@ -1,10 +1,8 @@
 import mongoose, {Schema} from 'mongoose'
 
 
-const LibraryIndexSchema = new Schema({
+const TrackSchema = new Schema({
   name: String,
-  geoJsonId: mongoose.Types.ObjectId ,
-  originalContentId: mongoose.Types.ObjectId,
   path: String,
   categories: {
     track: [String],
@@ -13,14 +11,14 @@ const LibraryIndexSchema = new Schema({
   date: {
     ms: Number,
     str: String
-  }
+  },
+  geoJsonId: mongoose.Types.ObjectId ,
+  originalContentId: mongoose.Types.ObjectId,
 });
 
-type LibraryIndex = {
+type BeTrack = {
   name: string,
   path: String,
-  GeoJsonId: string,
-  originalContentId: string,
   categories: {
     track?: string[],
     point?: string[]
@@ -29,10 +27,11 @@ type LibraryIndex = {
     ms: number,
     str: string
   }
-
+  geoJsonId: string,
+  originalContentId: string,
 }
 
 // Compile model from schema
-const LibraryIndex = mongoose.model('LibraryIndex', LibraryIndexSchema );
+const Track = mongoose.model('Track', TrackSchema );
 
-export default LibraryIndex
+export default Track

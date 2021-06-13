@@ -38,7 +38,7 @@ const multer_1 = __importDefault(require("multer"));
 const GeoJson_1 = __importStar(require("../models/GeoJson"));
 const xmldom_1 = require("xmldom");
 const OriginalTrack_1 = __importDefault(require("../models/OriginalTrack"));
-const LibraryIndex_1 = __importDefault(require("../models/LibraryIndex"));
+const Track_1 = __importDefault(require("../models/Track"));
 // const str = kmlMockupString();
 // const categories: string[] = []
 // const kmlParsed = new DOMParser().parseFromString(str);
@@ -59,20 +59,20 @@ const LibraryIndex_1 = __importDefault(require("../models/LibraryIndex"));
 const router = express_1.default.Router();
 var storage = multer_1.default.memoryStorage();
 const upload = multer_1.default({ dest: 'public/uploads/', storage: storage }).single('file');
-/** DEPRECATED get all tracks */
+/** get all tracks */
 router.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('maybe??');
-    const foundTracks = yield GeoJson_1.default.find();
-    res.json({ lenght: foundTracks.length, foundTracks });
+    const library = yield Track_1.default.find();
+    res.json({ lenght: library.length, library });
     //res.send('tracks')
 }));
-/** get track by id */
-router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+/** get geoJson by id */
+router.get("/geojson/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('maybe??');
     console.log(req.body.id);
     const _id = req.params.id;
     if (_id) {
-        GeoJson.findById(_id)
+        GeoJson_1.default.findById(_id)
             .then((track) => res.send(track))
             .catch(() => {
             res.status(404).json({ error: 'id not found' });
@@ -135,14 +135,9 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
                     format: fileFormat
                 });
                 const gjson = new GeoJson_1.default({
-                    // name: fileName,
-                    // path: 'root/',
-                    // date: date,
-                    // categories: categories,
-                    // libraryIndexId: libraryIndex._id,
                     geoJson: geoJson,
                 });
-                const libraryIndex = new LibraryIndex_1.default({
+                const track = new Track_1.default({
                     name: fileName,
                     path: 'root/',
                     categories: categories,
@@ -152,7 +147,7 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
                 });
                 yield originalTrack.save();
                 yield gjson.save();
-                yield libraryIndex.save();
+                yield track.save();
                 // return res.status(500).json( {error: 'some error'})
                 return res.json(gjson.geoJson);
             }

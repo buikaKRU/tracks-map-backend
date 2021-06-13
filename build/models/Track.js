@@ -19,30 +19,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TrackCategories = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-class TrackCategories {
-    constructor() {
-        this.track = [];
-        this.point = [];
-    }
-}
-exports.TrackCategories = TrackCategories;
-//https://medium.com/@agentwhs/complete-guide-for-typescript-for-mongoose-for-node-js-8cc0a7e470c1
-var TrackSchema = new mongoose_1.Schema({
+const TrackSchema = new mongoose_1.Schema({
     name: String,
+    path: String,
     categories: {
         track: [String],
         point: [String]
     },
-    geoJson: {},
-    libraryIndexId: mongoose_1.default.Types.ObjectId,
-    path: String,
-    originalContent: mongoose_1.default.Types.ObjectId,
     date: {
         ms: Number,
         str: String
-    }
+    },
+    geoJsonId: mongoose_1.default.Types.ObjectId,
+    originalContentId: mongoose_1.default.Types.ObjectId,
 });
 // Compile model from schema
 const Track = mongoose_1.default.model('Track', TrackSchema);

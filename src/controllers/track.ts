@@ -10,7 +10,7 @@ import GJson, {DateTrack, TrackCategories} from '../models/GeoJson'
 
 import {DOMParser} from 'xmldom'
 import OriginalTrack from '../models/OriginalTrack';
-import LibraryIndex from '../models/LibraryIndex';
+import Track from '../models/Track';
 
 
 
@@ -42,22 +42,22 @@ const upload = multer({dest: 'public/uploads/', storage: storage }).single('file
 
 
 
-/** DEPRECATED get all tracks */
+/** get all tracks */
 router.get("/all", async (req, res) => {
   console.log('maybe??')
-	const foundTracks = await GJson.find();
-	res.json({lenght: foundTracks.length, foundTracks})
+	const library = await Track.find();
+	res.json({lenght: library.length, library})
   //res.send('tracks')
 })
 
 
-/** get track by id */
-router.get("/:id", async (req, res) => {
+/** get geoJson by id */
+router.get("/geojson/:id", async (req, res) => {
   console.log('maybe??')
   console.log(req.body.id)
   const _id = req.params.id
   if (_id) {
-    GeoJson.findById(_id)
+    GJson.findById(_id)
     .then((track:any)=> res.send(track))
     .catch(() => {
       res.status(404).json({error: 'id not found'})
@@ -136,15 +136,10 @@ router.post("/addFile", async (req, res) => {
         })
         
         const gjson = new GJson({
-          // name: fileName,
-          // path: 'root/',
-          // date: date,
-          // categories: categories,
-          // libraryIndexId: libraryIndex._id,
           geoJson: geoJson,
         })
         
-        const libraryIndex = new LibraryIndex({
+        const track = new Track({
           name: fileName,
           path: 'root/',
           categories: categories,
@@ -155,7 +150,7 @@ router.post("/addFile", async (req, res) => {
         
         await originalTrack.save();
         await gjson.save();
-        await libraryIndex.save();
+        await track.save();
   
         // return res.status(500).json( {error: 'some error'})
         return res.json( gjson.geoJson );
