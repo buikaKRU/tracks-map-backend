@@ -3,7 +3,8 @@ import mongoose, {Schema} from 'mongoose'
 
 const LibraryIndexSchema = new Schema({
   name: String,
-  trackId: mongoose.Types.ObjectId ,
+  geoJsonId: mongoose.Types.ObjectId ,
+  originalContentId: mongoose.Types.ObjectId,
   path: String,
   categories: {
     track: [String],
@@ -17,8 +18,9 @@ const LibraryIndexSchema = new Schema({
 
 type LibraryIndex = {
   name: string,
-  trackId: string,
   path: String,
+  GeoJsonId: string,
+  originalContentId: string,
   categories: {
     track?: string[],
     point?: string[]
@@ -27,6 +29,7 @@ type LibraryIndex = {
     ms: number,
     str: string
   }
+
 }
 
 // Compile model from schema

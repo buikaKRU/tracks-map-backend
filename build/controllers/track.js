@@ -35,7 +35,7 @@ const express_1 = __importDefault(require("express"));
 const togeojson_1 = require("@tmcw/togeojson");
 //@ts-ignore
 const multer_1 = __importDefault(require("multer"));
-const Track_1 = __importStar(require("../models/Track"));
+const GeoJson_1 = __importStar(require("../models/GeoJson"));
 const xmldom_1 = require("xmldom");
 const OriginalTrack_1 = __importDefault(require("../models/OriginalTrack"));
 const LibraryIndex_1 = __importDefault(require("../models/LibraryIndex"));
@@ -62,7 +62,7 @@ const upload = multer_1.default({ dest: 'public/uploads/', storage: storage }).s
 /** DEPRECATED get all tracks */
 router.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('maybe??');
-    const foundTracks = yield Track_1.default.find();
+    const foundTracks = yield GeoJson_1.default.find();
     res.json({ lenght: foundTracks.length, foundTracks });
     //res.send('tracks')
 }));
@@ -72,7 +72,7 @@ router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     console.log(req.body.id);
     const _id = req.params.id;
     if (_id) {
-        Track_1.default.findById(_id)
+        GeoJson.findById(_id)
             .then((track) => res.send(track))
             .catch(() => {
             res.status(404).json({ error: 'id not found' });
@@ -97,13 +97,12 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
             const file = yield req.file;
             const fileName = ((_a = file.originalname) === null || _a === void 0 ? void 0 : _a.split('.')[0]) || 'default name';
             const fileFormat = file.originalname.split('.')[1];
-            let date = 
-            // {
-            //   ms: 0,
-            //   str: '1970-01-01'
-            // }
+            let date = {
+                ms: 0,
+                str: '1970-01-01'
+            };
             console.log('--------- fileFormat', fileFormat);
-            const categories = new Track_1.TrackCategories();
+            const categories = new GeoJson_1.TrackCategories();
             //console.log(file)
             const str = file.buffer.toString('utf-8');
             if (fileFormat === 'kml') {
@@ -135,27 +134,27 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
                     originalContent: str,
                     format: fileFormat
                 });
+                const gjson = new GeoJson_1.default({
+                    // name: fileName,
+                    // path: 'root/',
+                    // date: date,
+                    // categories: categories,
+                    // libraryIndexId: libraryIndex._id,
+                    geoJson: geoJson,
+                });
                 const libraryIndex = new LibraryIndex_1.default({
                     name: fileName,
                     path: 'root/',
                     categories: categories,
-                    date: date
-                });
-                const track = new Track_1.default({
-                    name: fileName,
-                    path: 'root/',
                     date: date,
-                    categories: categories,
-                    originalContent: originalTrack._id,
-                    libraryIndexId: libraryIndex._id,
-                    geoJson: geoJson,
+                    geoJsonId: gjson._id,
+                    originalContentId: originalTrack._id,
                 });
-                libraryIndex.trackId = track._id;
                 yield originalTrack.save();
-                yield track.save();
+                yield gjson.save();
                 yield libraryIndex.save();
                 // return res.status(500).json( {error: 'some error'})
-                return res.json(track.geoJson);
+                return res.json(gjson.geoJson);
             }
             else {
                 res.status(500).json({ error: 'gpx file format is not supported' });

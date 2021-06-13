@@ -1,4 +1,4 @@
-import { GeoJson } from './../GeoJson';
+import { GeoJson } from '../GeoJson';
 import mongoose, {Schema} from 'mongoose';
 
 export type Track = {
@@ -22,23 +22,27 @@ export type DateTrack = {
 }
 
 //https://medium.com/@agentwhs/complete-guide-for-typescript-for-mongoose-for-node-js-8cc0a7e470c1
-var TrackSchema = new Schema({
-  name: String,
-  categories: {
-    track: [String],
-    point: [String]
-  },
+var GeoJsonSchema = new Schema({
   geoJson: {},
-  libraryIndexId: mongoose.Types.ObjectId,
-  path: String,
-  originalContent: mongoose.Types.ObjectId,
-  date: {
-    ms: Number,
-    str: String
-  }
+  //libraryIndexId: mongoose.Types.ObjectId,
+
+  // name: String,
+
+  // categories: {
+  //   track: [String],
+  //   point: [String]
+  // },
+  // path: String,
+
+  // originalContent: mongoose.Types.ObjectId,
+  
+  // date: {
+  //   ms: Number,
+  //   str: String
+  // }
 });
 
 // Compile model from schema
-const Track = mongoose.model('Track', TrackSchema );
+const GeoJson = mongoose.model('GeoJson', GeoJsonSchema );
 
-export default Track
+export default GeoJson

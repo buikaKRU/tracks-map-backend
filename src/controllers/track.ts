@@ -5,7 +5,7 @@ import express from 'express'
 import { kml,kmlGen } from "@tmcw/togeojson";
 //@ts-ignore
 import multer from 'multer'
-import Track, {DateTrack, TrackCategories} from '../models/Track'
+import GJson, {DateTrack, TrackCategories} from '../models/GeoJson'
 
 
 import {DOMParser} from 'xmldom'
@@ -45,7 +45,7 @@ const upload = multer({dest: 'public/uploads/', storage: storage }).single('file
 /** DEPRECATED get all tracks */
 router.get("/all", async (req, res) => {
   console.log('maybe??')
-	const foundTracks = await Track.find();
+	const foundTracks = await GJson.find();
 	res.json({lenght: foundTracks.length, foundTracks})
   //res.send('tracks')
 })
@@ -57,7 +57,7 @@ router.get("/:id", async (req, res) => {
   console.log(req.body.id)
   const _id = req.params.id
   if (_id) {
-    Track.findById(_id)
+    GeoJson.findById(_id)
     .then((track:any)=> res.send(track))
     .catch(() => {
       res.status(404).json({error: 'id not found'})
@@ -89,10 +89,10 @@ router.post("/addFile", async (req, res) => {
       const fileName = file.originalname?.split('.')[0] || 'default name'
       const fileFormat: 'gpx' | 'kml' = file.originalname.split('.')[1];
       let date: DateTrack = 
-      // {
-      //   ms: 0,
-      //   str: '1970-01-01'
-      // }
+      {
+        ms: 0,
+        str: '1970-01-01'
+      }
 
       console.log('--------- fileFormat', fileFormat)
 
@@ -135,31 +135,30 @@ router.post("/addFile", async (req, res) => {
           format: fileFormat
         })
         
+        const gjson = new GJson({
+          // name: fileName,
+          // path: 'root/',
+          // date: date,
+          // categories: categories,
+          // libraryIndexId: libraryIndex._id,
+          geoJson: geoJson,
+        })
+        
         const libraryIndex = new LibraryIndex({
           name: fileName,
           path: 'root/',
           categories: categories,
-          date: date
-        })
-    
-        const track = new Track({
-          name: fileName,
-          path: 'root/',
           date: date,
-          categories: categories,
-          originalContent: originalTrack._id,
-          libraryIndexId: libraryIndex._id,
-          geoJson: geoJson,
+          geoJsonId: gjson._id,
+          originalContentId: originalTrack._id,
         })
-
-        libraryIndex.trackId = track._id
-
+        
         await originalTrack.save();
-        await track.save();
+        await gjson.save();
         await libraryIndex.save();
   
         // return res.status(500).json( {error: 'some error'})
-        return res.json( track.geoJson );
+        return res.json( gjson.geoJson );
       } else {
 
         res.status(500).json({ error: 'gpx file format is not supported' })
