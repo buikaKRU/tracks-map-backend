@@ -8,6 +8,8 @@ const TrackSchema = new Schema({
     track: [String],
     point: [String]
   },
+  tags: [String],
+  description: String,
   date: {
     ms: Number,
     str: String
@@ -23,12 +25,15 @@ type BeTrack = {
     track?: string[],
     point?: string[]
   },
+  tags: string[],
+  description: string,
   date?: {
     ms: number,
     str: string
   }
   geoJsonId: string,
   originalContentId: string,
+  _id: string
 }
 
 // Compile model from schema

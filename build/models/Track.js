@@ -27,6 +27,8 @@ const TrackSchema = new mongoose_1.Schema({
         track: [String],
         point: [String]
     },
+    tags: [String],
+    description: String,
     date: {
         ms: Number,
         str: String

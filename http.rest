@@ -2,7 +2,7 @@ GET http://localhost:5000/api/v1/tracks/all
 
 ###
 
-GET http://localhost:5000/api/v1/tracks/60b26fbc0cd66445666f6408
+GET http://localhost:5000/api/v1/tracks/geojson/60c6008b56ee823804eccfe0
 Content-Type: application/json
 
 # {
@@ -11,7 +11,12 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:5000/api/v1/library/all
+PATCH http://localhost:5000/api/v1/tracks/edit/name/60c6008b56ee823804eccfe1
+Content-Type: application/json
+
+{
+  "name": "abc track 9"
+}
 
 ###
 

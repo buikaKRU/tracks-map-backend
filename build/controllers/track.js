@@ -61,7 +61,7 @@ var storage = multer_1.default.memoryStorage();
 const upload = multer_1.default({ dest: 'public/uploads/', storage: storage }).single('file');
 /** get all tracks */
 router.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('maybe??');
+    // console.log('maybe??')
     const library = yield Track_1.default.find();
     res.json({ lenght: library.length, library });
     //res.send('tracks')
@@ -82,13 +82,23 @@ router.get("/geojson/:id", (req, res) => __awaiter(void 0, void 0, void 0, funct
         res.status(404).json({ error: 'no id provided, add {id: string} object to request' });
     }
 }));
-// router.post("/addTest", async (req, res) => {
-//   const track = new Track({
-//     name: req.body.name || 'default'
-//   })
-//   await track.save();
-//   res.send(track);
-// })
+router.patch("/edit/name/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const _id = req.params.id;
+    console.log('[server][track/edit/name]', _id);
+    const updatedName = req.body.name;
+    console.log('updatedName', req.body);
+    if (_id) {
+        Track_1.default.findByIdAndUpdate(_id, { name: updatedName }, { new: true }, (err, result) => {
+            if (err) {
+                res.status(404).json({ error: err });
+            }
+            else {
+                console.log(result.name);
+                res.send(result.name);
+            }
+        });
+    }
+}));
 router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     upload(req, res, (err) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
@@ -141,6 +151,8 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
                     name: fileName,
                     path: 'root/',
                     categories: categories,
+                    tags: ['testTag1', 'testTag2'],
+                    description: '',
                     date: date,
                     geoJsonId: gjson._id,
                     originalContentId: originalTrack._id,
