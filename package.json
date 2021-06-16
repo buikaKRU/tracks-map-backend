@@ -13,6 +13,7 @@
   "author": "mateusz przybylowski",
   "license": "ISC",
   "dependencies": {
+    "@types/uuid": "^8.3.0",
     "dotenv": "^9.0.2",
     "express": "^4.17.1",
     "express-form-data": "^2.0.16",
@@ -21,6 +22,7 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
     "ts-node": "^9.1.1",
+    "uuid": "^8.3.2",
     "xmldom": "^0.6.0"
   },
   "devDependencies": {

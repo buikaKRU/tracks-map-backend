@@ -18,24 +18,6 @@ const TrackSchema = new Schema({
   originalContentId: mongoose.Types.ObjectId,
 });
 
-type BeTrack = {
-  name: string,
-  path: String,
-  categories: {
-    track?: string[],
-    point?: string[]
-  },
-  tags: string[],
-  description: string,
-  date?: {
-    ms: number,
-    str: string
-  }
-  geoJsonId: string,
-  originalContentId: string,
-  _id: string
-}
-
 // Compile model from schema
 const Track = mongoose.model('Track', TrackSchema );
 

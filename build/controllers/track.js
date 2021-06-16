@@ -31,11 +31,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const GeoJson_1 = __importStar(require("../models/GeoJson"));
+const uuid_1 = require("uuid");
 const express_1 = __importDefault(require("express"));
 const togeojson_1 = require("@tmcw/togeojson");
 //@ts-ignore
 const multer_1 = __importDefault(require("multer"));
-const GeoJson_1 = __importStar(require("../models/GeoJson"));
 const xmldom_1 = require("xmldom");
 const OriginalTrack_1 = __importDefault(require("../models/OriginalTrack"));
 const Track_1 = __importDefault(require("../models/Track"));
@@ -135,6 +136,8 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
                         const dateString = (_b = feature.properties.timespan) === null || _b === void 0 ? void 0 : _b.begin;
                         !!dateString && (date = { str: dateString.split('T')[0], ms: Date.parse(dateString) });
                     }
+                    feature.properties.uuid = uuid_1.v4();
+                    console.log(feature.properties);
                 });
                 console.log('categories', categories);
                 console.log('date', date);
@@ -161,7 +164,7 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
                 yield gjson.save();
                 yield track.save();
                 // return res.status(500).json( {error: 'some error'})
-                return res.json(gjson.geoJson);
+                return res.json(track);
             }
             else {
                 res.status(500).json({ error: 'gpx file format is not supported' });

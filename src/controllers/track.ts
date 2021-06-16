@@ -1,11 +1,12 @@
-import { GeoJson } from './../GeoJson';
+import { BeDateTrack, BeGeoJson } from '../beInterface';
+import GeoJson, {TrackCategories} from '../models/GeoJson';
+import { v4 as uuidv4 } from 'uuid';
 
 
 import express from 'express'
 import { kml,kmlGen } from "@tmcw/togeojson";
 //@ts-ignore
 import multer from 'multer'
-import GJson, {DateTrack, TrackCategories} from '../models/GeoJson'
 
 
 import {DOMParser} from 'xmldom'
@@ -57,7 +58,7 @@ router.get("/geojson/:id", async (req, res) => {
   console.log(req.body.id)
   const _id = req.params.id
   if (_id) {
-    GJson.findById(_id)
+    GeoJson.findById(_id)
     .then((track:any)=> res.send(track))
     .catch(() => {
       res.status(404).json({error: 'id not found'})
@@ -96,7 +97,8 @@ router.post("/addFile", async (req, res) => {
       const file = await req.file;
       const fileName = file.originalname?.split('.')[0] || 'default name'
       const fileFormat: 'gpx' | 'kml' = file.originalname.split('.')[1];
-      let date: DateTrack = 
+      
+      let date: BeDateTrack = 
       {
         ms: 0,
         str: '1970-01-01'
@@ -111,7 +113,7 @@ router.post("/addFile", async (req, res) => {
       if (fileFormat === 'kml') { 
 
         const kmlParsed = new DOMParser().parseFromString(str);
-        const geoJson: GeoJson = kml(kmlParsed);
+        const geoJson: BeGeoJson = kml(kmlParsed);
         
         // categories and date
         geoJson.features.forEach(feature => {
@@ -129,6 +131,8 @@ router.post("/addFile", async (req, res) => {
             const dateString = feature.properties.timespan?.begin;
             !!dateString && (date = {str: dateString.split('T')[0], ms: Date.parse(dateString)})
           }
+          feature.properties.uuid = uuidv4();
+          console.log(feature.properties)
         })
 
         
@@ -143,7 +147,7 @@ router.post("/addFile", async (req, res) => {
           format: fileFormat
         })
         
-        const gjson = new GJson({
+        const gjson = new GeoJson({
           geoJson: geoJson,
         })
         
@@ -163,7 +167,7 @@ router.post("/addFile", async (req, res) => {
         await track.save();
   
         // return res.status(500).json( {error: 'some error'})
-        return res.json( gjson.geoJson );
+        return res.json( track );
       } else {
 
         res.status(500).json({ error: 'gpx file format is not supported' })
