@@ -1,4 +1,4 @@
-import { BeDateTrack, BeGeoJson } from '../beInterface';
+import { BeDateTrack, BeGeoJson } from '../BeInterface';
 import GeoJson, {TrackCategories} from '../models/GeoJson';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -46,7 +46,7 @@ const upload = multer({dest: 'public/uploads/', storage: storage }).single('file
 /** get all tracks */
 router.get("/all", async (req, res) => {
   // console.log('maybe??')
-	const library = await Track.find();
+	const library = await Track.find().lean();
 	res.json({lenght: library.length, library})
   //res.send('tracks')
 })
@@ -54,11 +54,11 @@ router.get("/all", async (req, res) => {
 
 /** get geoJson by id */
 router.get("/geojson/:id", async (req, res) => {
-  console.log('maybe??')
-  console.log(req.body.id)
+  // console.log('maybe??')
+  // console.log(req.body.id)
   const _id = req.params.id
   if (_id) {
-    GeoJson.findById(_id)
+    GeoJson.findById(_id, null, {lean: true})
     .then((track:any)=> res.send(track))
     .catch(() => {
       res.status(404).json({error: 'id not found'})
@@ -127,6 +127,13 @@ router.post("/addFile", async (req, res) => {
             featureType==="LineString" && categories.track.indexOf(featureCategory) === -1 && categories.track.push(featureCategory)
           }
           // date
+          //TODO: date i s not working
+          //!!! Date is not working
+          //TODO: date i s not working
+          //!!! Date is not working
+          //TODO: date i s not working
+          //!!! Date is not working
+
           if (!!!date && featureType === 'LineString') {
             const dateString = feature.properties.timespan?.begin;
             !!dateString && (date = {str: dateString.split('T')[0], ms: Date.parse(dateString)})
@@ -180,6 +187,7 @@ router.post("/addFile", async (req, res) => {
   })
   
 })
+
 
 const tracks = router;
 

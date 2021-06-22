@@ -25,8 +25,15 @@ GET http://localhost:5000
 ###
 
 POST http://localhost:5000/api/v1/tracks/addFile
+
+
+###
+
+PATCH http://localhost:5000/api/v1/features/edit/name/60d0fa90fdd65e31aad6ab9c/76d48f1a-9452-48e4-9485-fa1f87c20d04
 Content-Type: application/json
 
 {
-  "name": "abc track 5"
+  "name": "abc track 9"
 }
+
+###

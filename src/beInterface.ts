@@ -1,5 +1,4 @@
-
-export type BeGeoJson = BeGeoJsonFeatureCollection;
+export type BeGeoJson = BeGeoJsonFeatureCollection
 
 export type BeGeoJsonFeatureCollection = {
   type: 'FeatureCollection'
@@ -7,56 +6,54 @@ export type BeGeoJsonFeatureCollection = {
 }
 
 export type BeGeoJsonFeature = {
-  type: 'Feature',
-  geometry: BeGeoJsonGeometryPoint | BeGeoJsonGeometryLine,
+  type: 'Feature'
+  geometry?: BeGeoJsonGeometryPoint | BeGeoJsonGeometryPath
   properties: BeGeoJsonFeatureProps
 }
 
-
 export type BeGeoJsonGeometryPoint = {
-  type: 'Point',
+  type: 'Point'
   coordinates: number[]
 }
-export type BeGeoJsonGeometryLine = {
-  type: 'LineString',
-  coordinates: (number[])[]
+export type BeGeoJsonGeometryPath = {
+  type: 'LineString'
+  coordinates: number[][]
 }
 
 export type BeGeoJsonFeatureProps = {
-  name: string,
-  addres?: string,
-  description?: string,
-  adress?: string,
+  name: string
+  addres?: string
+  description?: string
+  adress?: string
   timespan?: {
-    begin: string,
+    begin: string
     end: string
-  },
-  Email: string,
-  Category: string,
+  }
+  Email: string
+  Category: string
   Distance: string
   uuid: string
 }
 
 export type BeTrack = {
-  name: string,
-  path: String,
+  name: string
+  path: String
   categories: {
-    paths?: string[],
+    paths?: string[]
     point?: string[]
-  },
-  tags: string[],
-  description: string,
+  }
+  tags: string[]
+  description: string
   date?: {
-    ms: number,
+    ms: number
     str: string
   }
-  geoJsonId: string,
-  originalContentId: string,
+  geoJsonId: string
+  originalContentId: string
   _id: string
 }
 
 export type BeDateTrack = {
-  ms: number,
+  ms: number
   str: string
 }
-

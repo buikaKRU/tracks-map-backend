@@ -63,17 +63,17 @@ const upload = multer_1.default({ dest: 'public/uploads/', storage: storage }).s
 /** get all tracks */
 router.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // console.log('maybe??')
-    const library = yield Track_1.default.find();
+    const library = yield Track_1.default.find().lean();
     res.json({ lenght: library.length, library });
     //res.send('tracks')
 }));
 /** get geoJson by id */
 router.get("/geojson/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('maybe??');
-    console.log(req.body.id);
+    // console.log('maybe??')
+    // console.log(req.body.id)
     const _id = req.params.id;
     if (_id) {
-        GeoJson_1.default.findById(_id)
+        GeoJson_1.default.findById(_id, null, { lean: true })
             .then((track) => res.send(track))
             .catch(() => {
             res.status(404).json({ error: 'id not found' });
@@ -132,6 +132,12 @@ router.post("/addFile", (req, res) => __awaiter(void 0, void 0, void 0, function
                         featureType === "LineString" && categories.track.indexOf(featureCategory) === -1 && categories.track.push(featureCategory);
                     }
                     // date
+                    //TODO: date i s not working
+                    //!!! Date is not working
+                    //TODO: date i s not working
+                    //!!! Date is not working
+                    //TODO: date i s not working
+                    //!!! Date is not working
                     if (!!!date && featureType === 'LineString') {
                         const dateString = (_b = feature.properties.timespan) === null || _b === void 0 ? void 0 : _b.begin;
                         !!dateString && (date = { str: dateString.split('T')[0], ms: Date.parse(dateString) });
